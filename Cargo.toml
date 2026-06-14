@@ -22,12 +22,15 @@ camino = { version = "1.1", features = ["serde1"] }
 gpui = { git = "https://github.com/zed-industries/zed", tag = "v1.6.0-pre", package = "gpui" }
 gpui_platform = { git = "https://github.com/zed-industries/zed", tag = "v1.6.0-pre", package = "gpui_platform" }
 mergiraf = { git = "https://github.com/peterkmg/mergiraf-yam", rev = "f5ced966a559bdb1a294bf75ad5a41965d558550" }
+rusqlite = { version = "0.40.1", features = ["bundled"] }
+rusqlite_migration = "2.6.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tempfile = "3.27"
 thiserror = "2.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+yam-cache = { path = "crates/yam-cache" }
 yam-merge = { path = "crates/yam-merge" }
 xml-3dm = "0.1.6"
 
