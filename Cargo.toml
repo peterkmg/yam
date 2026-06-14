@@ -32,6 +32,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 yam-cache = { path = "crates/yam-cache" }
 yam-merge = { path = "crates/yam-merge" }
+yam-tools = { path = "crates/yam-tools" }
 xml-3dm = "0.1.6"
 
 [workspace.lints.rust]
