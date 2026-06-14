@@ -28,17 +28,28 @@ impl std::fmt::Debug for CacheStore {
 impl CacheStore {
   pub fn open(root: impl AsRef<Path>) -> Result<Self, CacheError> {
     fs::create_dir_all(root.as_ref())?;
-
     let blob_root = root.as_ref().join(BLOB_DIR);
-    fs::create_dir_all(&blob_root)?;
-
     let database_path = root.as_ref().join(DATABASE_FILE);
-    let mut connection = Connection::open(&database_path)?;
+    let connection = Connection::open(&database_path)?;
 
+    Self::from_connection(database_path, blob_root, connection)
+  }
+
+  pub fn open_in_memory(blob_root: impl AsRef<Path>) -> Result<Self, CacheError> {
+    let database_path = PathBuf::from(":memory:");
+    let connection = Connection::open_in_memory()?;
+
+    Self::from_connection(database_path, blob_root.as_ref().to_path_buf(), connection)
+  }
+
+  fn from_connection(
+    database_path: PathBuf,
+    blob_root: PathBuf,
+    mut connection: Connection,
+  ) -> Result<Self, CacheError> {
+    fs::create_dir_all(&blob_root)?;
     apply_pragmas(&connection)?;
-
     schema::migrate(&mut connection)?;
-
     Ok(Self {
       database_path,
       blob_root,
