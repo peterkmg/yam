@@ -6,6 +6,7 @@ use crate::{MergeError, engines};
 pub enum MergeableFileType {
   WitcherScript,
   Xml,
+  Csv,
 }
 
 impl MergeableFileType {
@@ -20,6 +21,7 @@ impl MergeableFileType {
     {
       Some("ws") => Some(Self::WitcherScript),
       Some("xml") => Some(Self::Xml),
+      Some("csv") => Some(Self::Csv),
       _ => None,
     }
   }
@@ -72,5 +74,6 @@ pub fn merge(
   match file_type {
     MergeableFileType::WitcherScript => engines::mergiraf::merge(input),
     MergeableFileType::Xml => engines::xml_3dm::merge(input),
+    MergeableFileType::Csv => Ok(engines::mergiraf::merge_by_line(input)),
   }
 }

@@ -12,6 +12,10 @@ fn merge_file_type_matches_supported_extensions() {
     MergeableFileType::from_path("content/items/recipes.XML"),
     Some(MergeableFileType::Xml)
   );
+  assert_eq!(
+    MergeableFileType::from_path("content/items/prices.csv"),
+    Some(MergeableFileType::Csv)
+  );
 }
 
 #[test]

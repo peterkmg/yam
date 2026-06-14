@@ -1,6 +1,7 @@
 pub(crate) mod engines;
-mod errors;
+mod error;
+mod markers;
 mod merger;
 
-pub use errors::MergeError;
+pub use error::MergeError;
 pub use merger::{MergeInput, MergeResult, MergeableFileType, merge};

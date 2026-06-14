@@ -104,6 +104,27 @@ const XML_CONFLICTING_ATTRIBUTE_EDITS: MergeInput<'static> = MergeInput::new(
   XML_CONFLICTING_THEIRS,
 );
 
+const CSV_BASE: &str = "id,value\n1,base\n";
+const CSV_OURS_UNCHANGED: &str = "id,value\n1,base\n";
+const CSV_THEIRS_CHANGED: &str = "id,value\n1,theirs\n";
+const CSV_OURS_CHANGED: &str = "id,value\n1,ours\n";
+
+const CSV_ONE_SIDED_EDIT: MergeInput<'static> =
+  MergeInput::new(CSV_BASE, CSV_OURS_UNCHANGED, CSV_THEIRS_CHANGED);
+
+const CSV_OVERLAPPING_EDIT: MergeInput<'static> =
+  MergeInput::new(CSV_BASE, CSV_OURS_CHANGED, CSV_THEIRS_CHANGED);
+
+const CSV_INDEPENDENT_BASE: &str = "id,value\n1,base-one\n2,unchanged\n3,base-three\n";
+const CSV_INDEPENDENT_OURS: &str = "id,value\n1,ours\n2,unchanged\n3,base-three\n";
+const CSV_INDEPENDENT_THEIRS: &str = "id,value\n1,base-one\n2,unchanged\n3,theirs\n";
+
+const CSV_INDEPENDENT_LINE_EDITS: MergeInput<'static> = MergeInput::new(
+  CSV_INDEPENDENT_BASE,
+  CSV_INDEPENDENT_OURS,
+  CSV_INDEPENDENT_THEIRS,
+);
+
 #[test]
 fn mergiraf_merges_independent_witcher_script_functions() {
   let outcome = merge(
@@ -194,4 +215,35 @@ fn xml_merge_reports_conflicting_attribute_changes() {
   assert!(outcome.text.contains(">>>>>>> theirs"));
   assert!(outcome.text.contains(r#"value="ours""#));
   assert!(outcome.text.contains(r#"value="theirs""#));
+}
+
+#[test]
+fn csv_merge_accepts_one_sided_change() {
+  let outcome = merge(MergeableFileType::Csv, CSV_ONE_SIDED_EDIT).expect("merge should run");
+
+  assert!(outcome.is_clean());
+  assert_eq!(outcome.text, CSV_THEIRS_CHANGED);
+}
+
+#[test]
+fn csv_merge_combines_independent_line_edits() {
+  let outcome =
+    merge(MergeableFileType::Csv, CSV_INDEPENDENT_LINE_EDITS).expect("merge should run");
+
+  assert!(outcome.is_clean());
+  assert!(outcome.text.contains("1,ours"));
+  assert!(outcome.text.contains("2,unchanged"));
+  assert!(outcome.text.contains("3,theirs"));
+}
+
+#[test]
+fn csv_merge_marks_overlapping_change() {
+  let outcome = merge(MergeableFileType::Csv, CSV_OVERLAPPING_EDIT).expect("merge should run");
+
+  assert!(!outcome.is_clean());
+  assert_eq!(outcome.conflict_count(), 1);
+  assert!(outcome.text.contains("<<<<<<< ours"));
+  assert!(outcome.text.contains("||||||| base"));
+  assert!(outcome.text.contains("======="));
+  assert!(outcome.text.contains(">>>>>>> theirs"));
 }
