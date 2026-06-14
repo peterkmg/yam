@@ -15,6 +15,8 @@
 *.ps1 text eol=lf
 *.sh text eol=lf
 
+samples/**/*.ws text eol=lf
+
 *.bmp binary
 *.gif binary
 *.ico binary

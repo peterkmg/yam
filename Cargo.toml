@@ -1,0 +1,49 @@
+[workspace]
+members = [
+  "crates/yam-cache",
+  "crates/yam-cli",
+  "crates/yam-core",
+  "crates/yam-gpui",
+  "crates/yam-merge",
+  "crates/yam-tools",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+license = "GPL-3.0-only"
+rust-version = "1.96"
+
+[workspace.dependencies]
+anyhow = "1.0"
+argh = { version = "0.1.19", default-features = false, features = ["help"] }
+blake3 = "1.8"
+camino = { version = "1.1", features = ["serde1"] }
+gpui = { git = "https://github.com/zed-industries/zed", tag = "v1.6.0-pre", package = "gpui" }
+gpui_platform = { git = "https://github.com/zed-industries/zed", tag = "v1.6.0-pre", package = "gpui_platform" }
+mergiraf = { git = "https://github.com/peterkmg/mergiraf-yam", rev = "f5ced966a559bdb1a294bf75ad5a41965d558550" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tempfile = "3.27"
+thiserror = "2.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+yam-merge = { path = "crates/yam-merge" }
+xml-3dm = "0.1.6"
+
+[workspace.lints.rust]
+missing_debug_implementations = "warn"
+unsafe_code = "forbid"
+unused_crate_dependencies = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+cargo_common_metadata = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+multiple_crate_versions = "allow"
