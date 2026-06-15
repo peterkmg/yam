@@ -3,6 +3,8 @@ use std::{
   path::{Path, PathBuf},
 };
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
   ToolError,
   ToolKind,
@@ -10,12 +12,14 @@ use crate::{
   template::{TemplateValue, expand_arguments},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ToolCommand {
   pub program: PathBuf,
   pub args: Vec<String>,
+  #[serde(default)]
   pub launch_mode: LaunchMode,
   pub working_dir: Option<PathBuf>,
+  #[serde(default = "default_success_exit_codes")]
   pub success_exit_codes: Vec<i32>,
 }
 
@@ -73,7 +77,7 @@ impl ToolCommand {
   }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum LaunchMode {
   #[default]
   Direct,
@@ -121,7 +125,7 @@ impl LaunchMode {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WineLaunch {
   pub executable: PathBuf,
   pub prefix: Option<PathBuf>,
@@ -162,7 +166,7 @@ impl WineLaunch {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PathMapping {
   pub host_prefix: PathBuf,
   pub tool_prefix: String,
@@ -214,4 +218,8 @@ impl PathMapping {
       ))
     }
   }
+}
+
+fn default_success_exit_codes() -> Vec<i32> {
+  vec![0]
 }

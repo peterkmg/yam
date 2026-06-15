@@ -43,6 +43,15 @@ pub enum ToolError {
   MissingToolOutput { tool: ToolKind, path: PathBuf },
   #[error("extracted file was not created: {path}")]
   MissingExtractedFile { path: PathBuf },
+  #[error("{tool} path is not a valid logical path: {path}")]
+  InvalidLogicalPath {
+    tool: ToolKind,
+    path: String,
+    #[source]
+    source: yam_fs::FsError,
+  },
+  #[error("tool filesystem operation failed: {0}")]
+  FileSystem(#[from] yam_fs::FsError),
   #[error("tool file operation failed: {source}")]
   Io {
     #[source]

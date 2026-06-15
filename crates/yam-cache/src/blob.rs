@@ -1,6 +1,5 @@
-use std::fs;
-
 use rusqlite::{OptionalExtension, params};
+use yam_fs::{read_bytes, write_bytes};
 
 use crate::{CacheError, CacheStore, ContentHash, util::sqlite_len};
 
@@ -18,11 +17,7 @@ impl CacheStore {
     let path = self.blob_path(&hash);
 
     if !path.is_file() {
-      if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-      }
-
-      fs::write(&path, bytes)?;
+      write_bytes(&path, bytes)?;
     }
 
     let mut statement = self.connection.prepare_cached(
@@ -43,7 +38,7 @@ impl CacheStore {
       return Err(CacheError::MissingBlob(hash.to_hex()));
     }
 
-    Ok(fs::read(path)?)
+    Ok(read_bytes(path)?)
   }
 
   pub fn has_blob(&self, hash: &ContentHash) -> Result<bool, CacheError> {

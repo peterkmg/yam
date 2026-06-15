@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
   ToolCommand,
   ToolError,
@@ -10,7 +12,7 @@ use crate::{
   template::TemplateValue,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EditorProfile {
   pub name: String,
   pub command: ToolCommand,

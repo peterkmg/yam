@@ -1,7 +1,7 @@
-use std::{
-  fs,
-  path::{Path, PathBuf},
-};
+use std::path::PathBuf;
+
+use serde::{Deserialize, Serialize};
+use yam_fs::remove_file_if_exists;
 
 use crate::{
   ToolCommand,
@@ -11,7 +11,7 @@ use crate::{
   template::TemplateValue,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MergeToolProfile {
   pub name: String,
   pub command: ToolCommand,
@@ -116,7 +116,7 @@ impl<R: CommandRunner> ManualMergeTool<R> {
 
   pub fn merge(&self, input: &ManualMergeInput) -> Result<ToolRun, ToolError> {
     self.profile.validate()?;
-    remove_existing_output(&input.output)?;
+    remove_file_if_exists(&input.output)?;
 
     let base = input.base.to_string_lossy();
     let left = input.left.to_string_lossy();
@@ -180,12 +180,4 @@ impl<R: CommandRunner> ManualMergeTool<R> {
       })
     }
   }
-}
-
-fn remove_existing_output(path: &Path) -> Result<(), ToolError> {
-  if path.is_file() {
-    fs::remove_file(path).map_err(|source| ToolError::Io { source })?;
-  }
-
-  Ok(())
 }

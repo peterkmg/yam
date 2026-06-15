@@ -62,7 +62,7 @@ pub fn artifact_input_with_path(
       SourceId::new(source_id),
       SourceRole::Mod,
       ArtifactKind::LooseFile,
-      LogicalPath::new(logical_path),
+      LogicalPath::new(logical_path).unwrap(),
     ),
     disk_path: disk_path.to_path_buf(),
   }

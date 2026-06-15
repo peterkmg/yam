@@ -3,6 +3,8 @@ use std::{
   path::{Path, PathBuf},
 };
 
+use yam_fs::LogicalPath;
+
 use crate::{
   command::{CommandRunner, CommandSpec, SystemRunner, ToolRun, require_exit_code},
   error::{ToolError, require_file},
@@ -126,7 +128,7 @@ impl<R: CommandRunner> QuickBms<R> {
 
     require_exit_code(output, ToolKind::QuickBms, &[0])?;
 
-    let path = extracted_path(&input.output_dir, &input.entry_path);
+    let path = extracted_path(&input.output_dir, &input.entry_path)?;
     if path.is_file() {
       Ok(path)
     } else {
@@ -195,8 +197,12 @@ fn parse_entry_line(line: &str) -> Result<Option<BundleEntry>, ToolError> {
     return parse_error(line);
   }
 
+  let Ok(path) = LogicalPath::new(&path) else {
+    return parse_error(line);
+  };
+
   Ok(Some(BundleEntry {
-    path: normalize_entry_path(&path),
+    path: path.into_string(),
     offset,
     size,
   }))
@@ -209,12 +215,12 @@ fn parse_error<T>(line: &str) -> Result<T, ToolError> {
   })
 }
 
-fn normalize_entry_path(path: &str) -> String {
-  path.replace('\\', "/")
-}
+fn extracted_path(output_dir: &Path, entry_path: &str) -> Result<PathBuf, ToolError> {
+  let path = LogicalPath::new(entry_path).map_err(|source| ToolError::InvalidLogicalPath {
+    tool: ToolKind::QuickBms,
+    path: entry_path.to_string(),
+    source,
+  })?;
 
-fn extracted_path(output_dir: &Path, entry_path: &str) -> PathBuf {
-  normalize_entry_path(entry_path)
-    .split('/')
-    .fold(output_dir.to_path_buf(), |path, segment| path.join(segment))
+  Ok(path.to_disk_path(output_dir))
 }

@@ -5,6 +5,11 @@ mod support;
 use yam_cache::{ArtifactKind, LogicalPath, ObservationStatus, SourceId};
 
 #[test]
+fn logical_path_uses_shared_validation() {
+  assert!(LogicalPath::new("../outside.ws").is_err());
+}
+
+#[test]
 fn observe_file_tracks_new_unchanged_and_changed_artifacts() {
   let case = support::CacheCase::in_memory();
   let file = case.root().join("input.ws");
@@ -23,7 +28,7 @@ fn observe_file_tracks_new_unchanged_and_changed_artifacts() {
   assert_eq!(first.artifact.input.key.kind, ArtifactKind::LooseFile);
   assert_eq!(
     first.artifact.input.key.logical_path,
-    LogicalPath::new("content/scripts/input.ws")
+    LogicalPath::new("content/scripts/input.ws").unwrap()
   );
   assert_eq!(first.artifact.byte_len, 7);
 

@@ -6,6 +6,8 @@ use thiserror::Error;
 pub enum CacheError {
   #[error("cache I/O failed: {0}")]
   Io(#[from] io::Error),
+  #[error("cache filesystem failed: {0}")]
+  FileSystem(#[from] yam_fs::FsError),
   #[error("cache database failed: {0}")]
   Sqlite(#[from] rusqlite::Error),
   #[error("failed to migrate cache schema: {0}")]
