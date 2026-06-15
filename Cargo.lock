@@ -7861,7 +7861,6 @@ dependencies = [
  "anyhow",
  "argh",
  "tempfile",
- "tracing",
  "tracing-subscriber",
  "yam-cache",
  "yam-core",
@@ -7903,7 +7902,6 @@ version = "0.1.0"
 dependencies = [
  "gpui",
  "gpui_platform",
- "yam-core",
 ]
 
 [[package]]

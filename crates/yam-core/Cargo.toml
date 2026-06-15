@@ -1,0 +1,24 @@
+[package]
+name = "yam-core"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+camino.workspace = true
+ini.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+toml_edit.workspace = true
+yam-cache.workspace = true
+yam-fs.workspace = true
+yam-merge.workspace = true
+yam-tools.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

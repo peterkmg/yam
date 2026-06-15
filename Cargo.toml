@@ -36,6 +36,7 @@ toml_edit = { version = "0.25.12", features = ["serde"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 yam-cache = { path = "crates/yam-cache" }
+yam-core = { path = "crates/yam-core" }
 yam-fs = { path = "crates/yam-fs" }
 yam-merge = { path = "crates/yam-merge" }
 yam-tools = { path = "crates/yam-tools" }
