@@ -52,6 +52,13 @@ pub struct SystemRunner;
 
 impl CommandRunner for SystemRunner {
   fn run(&self, command: &CommandSpec) -> Result<ToolRun, ToolError> {
+    tracing::trace!(
+      tool = ?command.tool,
+      program = %command.program.display(),
+      args = ?command.args,
+      working_dir = ?command.working_dir,
+      "running external tool"
+    );
     let mut process = Command::new(&command.program);
     process.args(&command.args);
 
@@ -68,11 +75,20 @@ impl CommandRunner for SystemRunner {
       source,
     })?;
 
-    Ok(ToolRun {
+    let run = ToolRun {
       status_code: output.status.code(),
       stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
       stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
-    })
+    };
+    tracing::debug!(
+      tool = ?command.tool,
+      status_code = ?run.status_code,
+      stdout_len = run.stdout.len(),
+      stderr_len = run.stderr.len(),
+      "external tool finished"
+    );
+
+    Ok(run)
   }
 }
 
@@ -87,6 +103,13 @@ pub fn require_exit_code(
   {
     Ok(output)
   } else {
+    tracing::warn!(
+      tool = ?tool,
+      status_code = ?output.status_code,
+      stdout_len = output.stdout.len(),
+      stderr_len = output.stderr.len(),
+      "external tool failed"
+    );
     Err(ToolError::CommandFailed {
       tool,
       status_code: output.status_code,

@@ -43,6 +43,12 @@ impl CacheStore {
       ],
       |row| row.get(0),
     )?;
+    tracing::trace!(
+      entry_kind = input.kind.as_storage(),
+      producer_kind = input.producer.kind.as_storage(),
+      input_key = ?input.input_key,
+      "cache entry stored"
+    );
 
     Ok(CacheEntry {
       id,
@@ -67,7 +73,7 @@ impl CacheStore {
         ",
     )?;
 
-    statement
+    let entry = statement
       .query_row(
         params![
           kind.as_storage(),
@@ -98,7 +104,7 @@ impl CacheStore {
           output_hash,
           metadata_json,
         )| {
-          Ok(CacheEntry {
+          Ok::<CacheEntry, CacheError>(CacheEntry {
             id,
             input: CacheEntryInput {
               kind: CacheEntryKind::from_str(&entry_kind)?,
@@ -116,6 +122,16 @@ impl CacheStore {
           })
         },
       )
-      .transpose()
+      .transpose()?;
+
+    tracing::trace!(
+      entry_kind = kind.as_storage(),
+      producer_kind = producer.kind.as_storage(),
+      input_key = ?input_key,
+      found = entry.is_some(),
+      "cache entry lookup completed"
+    );
+
+    Ok(entry)
   }
 }

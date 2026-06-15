@@ -81,6 +81,7 @@ impl<R: CommandRunner> QuickBms<R> {
 
   pub fn list_bundle(&self, bundle_path: impl AsRef<Path>) -> Result<Vec<BundleEntry>, ToolError> {
     let bundle_path = bundle_path.as_ref();
+    tracing::debug!(bundle_path = %bundle_path.display(), "listing bundle");
     self.validate_bundle_inputs(bundle_path)?;
 
     let command = self.launch_mode.apply(CommandSpec::new(
@@ -97,10 +98,22 @@ impl<R: CommandRunner> QuickBms<R> {
     let output = self.runner.run(&command)?;
     let output = require_exit_code(output, ToolKind::QuickBms, &[0])?;
 
-    parse_bundle_list(&output)
+    let entries = parse_bundle_list(&output)?;
+    tracing::debug!(
+      bundle_path = %bundle_path.display(),
+      entry_count = entries.len(),
+      "bundle listed"
+    );
+    Ok(entries)
   }
 
   pub fn extract_file(&self, input: &ExtractFileInput) -> Result<PathBuf, ToolError> {
+    tracing::debug!(
+      bundle_path = %input.bundle_path.display(),
+      entry_path = %input.entry_path,
+      output_dir = %input.output_dir.display(),
+      "extracting bundle entry"
+    );
     self.validate_bundle_inputs(&input.bundle_path)?;
 
     let command = self.launch_mode.apply(CommandSpec::new(
@@ -130,6 +143,7 @@ impl<R: CommandRunner> QuickBms<R> {
 
     let path = extracted_path(&input.output_dir, &input.entry_path)?;
     if path.is_file() {
+      tracing::debug!(path = %path.display(), "bundle entry extracted");
       Ok(path)
     } else {
       Err(ToolError::MissingExtractedFile { path })

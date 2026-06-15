@@ -31,6 +31,7 @@ pub fn relative_path(root: &Utf8Path, path: &Utf8Path) -> Result<LogicalPath, Fs
 }
 
 pub fn walk_files(root: &Utf8Path) -> Result<Vec<WalkedFile>, FsError> {
+  tracing::debug!(root = %root, "walking files");
   let root = root.to_path_buf();
   let (sender, receiver) = mpsc::channel();
   let walker = walk_builder(&root).build_parallel();
@@ -57,6 +58,7 @@ pub fn walk_files(root: &Utf8Path) -> Result<Vec<WalkedFile>, FsError> {
   }
 
   files.sort_by(|left, right| left.relative_path.cmp(&right.relative_path));
+  tracing::debug!(root = %root, file_count = files.len(), "walk completed");
 
   Ok(files)
 }
@@ -148,9 +150,12 @@ fn walked_file(
     Err(error) => return Some(Err(error)),
   };
 
-  Some(relative_path(root, &path).map(|relative_path| WalkedFile {
-    relative_path,
-    path,
+  Some(relative_path(root, &path).map(|relative_path| {
+    tracing::trace!(path = %path, relative_path = relative_path.as_str(), "walked file");
+    WalkedFile {
+      relative_path,
+      path,
+    }
   }))
 }
 

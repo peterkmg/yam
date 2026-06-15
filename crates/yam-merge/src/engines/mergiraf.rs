@@ -29,6 +29,7 @@ pub fn merge(input: MergeInput<'_>) -> Result<MergeResult, MergeError> {
   let Some(profile) = LangProfile::find_by_name(WITCHER_SCRIPT_LANGUAGE) else {
     return Err(MergeError::MergirafLanguage(WITCHER_SCRIPT_LANGUAGE));
   };
+  tracing::trace!(language = WITCHER_SCRIPT_LANGUAGE, "running mergiraf merge");
 
   let result = cascading_merge(
     Arc::new(Cow::Owned(input.base.to_owned())),
@@ -45,6 +46,10 @@ pub fn merge(input: MergeInput<'_>) -> Result<MergeResult, MergeError> {
   .expect("Mergiraf always returns at least the line-based merge");
 
   if result.has_additional_issues && result.conflict_count == 0 {
+    tracing::warn!(
+      language = WITCHER_SCRIPT_LANGUAGE,
+      "mergiraf reported marker-free merge issues"
+    );
     return Err(MergeError::UnmarkedMergeIssues);
   }
 

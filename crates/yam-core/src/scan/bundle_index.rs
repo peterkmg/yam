@@ -55,14 +55,25 @@ pub fn load_or_build(
 
   if let Some(entry) = cache.get_entry(CacheEntryKind::BundleIndex, &bundle_hash, &producer)? {
     let metadata: BundleIndexMetadata = serde_json::from_value(entry.input.metadata)?;
+    tracing::debug!(
+      bundle_path = %bundle_path,
+      entry_count = metadata.entries.len(),
+      "bundle index cache hit"
+    );
     return Ok(Some(metadata.entries));
   }
 
   let Some(bundle_lister) = bundle_lister else {
+    tracing::debug!(bundle_path = %bundle_path, "bundle index unavailable without lister");
     return Ok(None);
   };
 
   let entries = bundle_lister.list_bundle(bundle_path)?;
+  tracing::debug!(
+    bundle_path = %bundle_path,
+    entry_count = entries.len(),
+    "bundle index built"
+  );
   cache.put_entry(&CacheEntryInput {
     kind: CacheEntryKind::BundleIndex,
     input_key: bundle_hash,

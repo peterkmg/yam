@@ -4,6 +4,7 @@ use super::{BOTTOM_PRIORITY, LoadOrder, LoadOrderEntry, LoadOrderError};
 
 impl LoadOrder {
   pub fn parse(text: &str) -> Result<Self, LoadOrderError> {
+    tracing::debug!("parsing load order");
     let ini = ini::Ini::load_from_str(text)?;
     let mut entries = Vec::new();
 
@@ -12,9 +13,17 @@ impl LoadOrder {
         continue;
       };
 
-      entries.push(parse_entry(mod_name, properties)?);
+      let entry = parse_entry(mod_name, properties)?;
+      tracing::trace!(
+        mod_name = %entry.mod_name,
+        enabled = entry.enabled,
+        priority = entry.priority,
+        "load order entry parsed"
+      );
+      entries.push(entry);
     }
 
+    tracing::debug!(entry_count = entries.len(), "load order parsed");
     Ok(Self::from_entries(entries))
   }
 }

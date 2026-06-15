@@ -16,8 +16,11 @@ impl CacheStore {
     let sqlite_byte_len = sqlite_len(byte_len, "blob byte length")?;
     let path = self.blob_path(&hash);
 
-    if !path.is_file() {
+    if path.is_file() {
+      tracing::trace!(hash = ?hash, byte_len, path = %path.display(), "blob already exists");
+    } else {
       write_bytes(&path, bytes)?;
+      tracing::trace!(hash = ?hash, byte_len, path = %path.display(), "blob written");
     }
 
     let mut statement = self.connection.prepare_cached(
@@ -38,7 +41,9 @@ impl CacheStore {
       return Err(CacheError::MissingBlob(hash.to_hex()));
     }
 
-    Ok(read_bytes(path)?)
+    let bytes = read_bytes(&path)?;
+    tracing::trace!(hash = ?hash, byte_len = bytes.len(), path = %path.display(), "blob read");
+    Ok(bytes)
   }
 
   pub fn has_blob(&self, hash: &ContentHash) -> Result<bool, CacheError> {

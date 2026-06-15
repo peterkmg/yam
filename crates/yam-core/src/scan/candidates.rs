@@ -34,7 +34,7 @@ pub fn merge_candidates_from_sources(
       .push(SourceRef::BundleEntry(entry));
   }
 
-  grouped
+  let candidates = grouped
     .into_iter()
     .filter(|(_, sources)| sources.len() > 1)
     .map(|(relative_path, sources)| MergeCandidate {
@@ -42,7 +42,13 @@ pub fn merge_candidates_from_sources(
       relative_path: relative_path.to_string(),
       sources: sources.into_iter().map(merge_source).collect(),
     })
-    .collect()
+    .collect::<Vec<_>>();
+
+  tracing::debug!(
+    candidate_count = candidates.len(),
+    "merge candidates grouped"
+  );
+  candidates
 }
 
 fn merge_source(source: SourceRef<'_>) -> MergeSource {

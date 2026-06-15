@@ -25,6 +25,14 @@ pub fn discover_game_folder(root: &GameRoot) -> Result<ResolvedEnvironment, Envi
     path: mods_dir.join(DEFAULT_OUTPUT_MOD_NAME),
   };
   let mods = read_mod_dirs(&mods_dir, Some(&output_mod.name))?;
+  tracing::debug!(
+    mode = "game-folder",
+    root = %root.path(),
+    mods_dir = %mods_dir,
+    output_mod = %output_mod.name,
+    mod_count = mods.len(),
+    "environment resolved"
+  );
 
   Ok(ResolvedEnvironment {
     kind: ModEnvironmentKind::GameFolder,

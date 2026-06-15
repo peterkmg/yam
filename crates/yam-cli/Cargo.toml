@@ -12,7 +12,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow.workspace = true
 argh.workspace = true
-tracing-subscriber.workspace = true
+tracing.workspace = true
 yam-cache.workspace = true
 yam-core.workspace = true
 yam-fs.workspace = true

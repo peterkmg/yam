@@ -71,9 +71,17 @@ pub fn merge(
   file_type: MergeableFileType,
   input: MergeInput<'_>,
 ) -> Result<MergeResult, MergeError> {
-  match file_type {
+  tracing::debug!(file_type = ?file_type, "merge started");
+  let result = match file_type {
     MergeableFileType::WitcherScript => engines::mergiraf::merge(input),
     MergeableFileType::Xml => engines::xml_3dm::merge(input),
     MergeableFileType::Csv => Ok(engines::mergiraf::merge_by_line(input)),
-  }
+  }?;
+  tracing::debug!(
+    file_type = ?file_type,
+    is_clean = result.is_clean(),
+    conflict_count = result.conflict_count(),
+    "merge completed"
+  );
+  Ok(result)
 }

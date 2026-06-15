@@ -3,11 +3,18 @@ use crate::{LoadOrder, MergeCandidate, ScanReport};
 
 #[must_use]
 pub fn classify_conflicts(report: &ScanReport, load_order: &LoadOrder) -> Vec<ClassifiedConflict> {
-  report
+  let conflicts = report
     .merge_candidates
     .iter()
     .map(|candidate| classify_candidate(candidate, load_order))
-    .collect()
+    .collect::<Vec<_>>();
+
+  tracing::debug!(
+    candidate_count = report.merge_candidates.len(),
+    conflict_count = conflicts.len(),
+    "conflicts classified"
+  );
+  conflicts
 }
 
 fn classify_candidate(candidate: &MergeCandidate, load_order: &LoadOrder) -> ClassifiedConflict {
@@ -38,6 +45,13 @@ fn classify_candidate(candidate: &MergeCandidate, load_order: &LoadOrder) -> Cla
   {
     winner.is_winner = true;
   }
+  tracing::trace!(
+    relative_path = %candidate.relative_path,
+    action = ?action,
+    active_count,
+    source_count = sources.len(),
+    "conflict candidate classified"
+  );
 
   ClassifiedConflict {
     relative_path: candidate.relative_path.clone(),

@@ -28,12 +28,25 @@ pub fn scan_environment(
   cache: &CacheStore,
   options: ScanOptions<'_>,
 ) -> Result<ScanReport, ScanError> {
+  tracing::debug!(
+    mode = %environment.kind,
+    mod_count = environment.mods.len(),
+    "scan environment started"
+  );
   let mut files = Vec::new();
   let mut bundles = Vec::new();
   let mut bundle_entries = Vec::new();
 
   for mod_source in &environment.mods {
-    for discovered in walker::discover_paths(mod_source.path())? {
+    let discovered_paths = walker::discover_paths(mod_source.path())?;
+    tracing::debug!(
+      mod_name = mod_source.name(),
+      path = %mod_source.path(),
+      discovered_count = discovered_paths.len(),
+      "mod paths discovered"
+    );
+
+    for discovered in discovered_paths {
       let walker::DiscoveredPath {
         relative_path,
         path,
@@ -60,6 +73,13 @@ pub fn scan_environment(
   }
 
   let merge_candidates = candidates::merge_candidates_from_sources(&files, &bundle_entries);
+  tracing::debug!(
+    file_count = files.len(),
+    bundle_count = bundles.len(),
+    bundle_entry_count = bundle_entries.len(),
+    candidate_count = merge_candidates.len(),
+    "scan environment completed"
+  );
   Ok(ScanReport {
     files,
     bundles,

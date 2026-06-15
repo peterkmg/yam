@@ -4,6 +4,7 @@ pub mod config;
 pub mod conflict;
 pub mod environment;
 pub mod load_order;
+pub mod logging;
 pub mod paths;
 pub mod scan;
 
@@ -40,6 +41,7 @@ pub use load_order::{
   TOP_PRIORITY,
   compare_game_mod_names,
 };
+pub use logging::{FileLogPaths, FileLoggingOptions, LogLevel, LoggingError, init_file_logging};
 pub use paths::GameRoot;
 pub use scan::{
   BundleLister,

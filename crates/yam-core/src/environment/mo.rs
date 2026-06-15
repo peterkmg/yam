@@ -31,6 +31,15 @@ pub fn discover_mod_organizer(
     .join(&profile)
     .join("modlist.txt");
   let mods = read_modlist(&modlist_path, &mods_dir)?;
+  tracing::debug!(
+    mode = "mod-organizer",
+    root = %instance_root,
+    profile = %profile,
+    mods_dir = %mods_dir,
+    output_mod = %output_mod.name,
+    mod_count = mods.len(),
+    "environment resolved"
+  );
 
   Ok(ResolvedEnvironment {
     kind: ModEnvironmentKind::ModOrganizer,

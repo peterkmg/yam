@@ -15,6 +15,7 @@ use crate::{
 };
 
 pub fn merge(input: MergeInput<'_>) -> Result<MergeResult, MergeError> {
+  tracing::trace!("running 3dm xml merge");
   let base_parser = XmlParser::new(BaseNodeFactory);
   let branch_parser = XmlParser::new(BranchNodeFactory);
 
@@ -27,6 +28,7 @@ pub fn merge(input: MergeInput<'_>) -> Result<MergeResult, MergeError> {
   let tree = merger.merge_to_tree();
   let mut content = render_document(&tree)?;
   let conflict_count = merger.conflict_log.conflict_count();
+  tracing::debug!(conflict_count, "3dm xml merge completed");
 
   if conflict_count > 0 {
     let fragments = merger
@@ -46,6 +48,10 @@ pub fn merge(input: MergeInput<'_>) -> Result<MergeResult, MergeError> {
     if let Some(rendered) = render_xml_conflicts(content, &fragments) {
       content = rendered;
     } else {
+      tracing::warn!(
+        conflict_count,
+        "xml conflict fragments could not be inserted; using whole-file conflict"
+      );
       content = whole_file_conflict(input);
     }
   }

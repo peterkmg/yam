@@ -7851,6 +7851,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 2.0.18",
+ "tracing",
  "yam-fs",
 ]
 
@@ -7861,7 +7862,7 @@ dependencies = [
  "anyhow",
  "argh",
  "tempfile",
- "tracing-subscriber",
+ "tracing",
  "yam-cache",
  "yam-core",
  "yam-fs",
@@ -7879,6 +7880,8 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.18",
  "toml_edit 0.25.12+spec-1.1.0",
+ "tracing",
+ "tracing-subscriber",
  "yam-cache",
  "yam-fs",
  "yam-merge",
@@ -7894,6 +7897,7 @@ dependencies = [
  "relative-path",
  "tempfile",
  "thiserror 2.0.18",
+ "tracing",
 ]
 
 [[package]]
@@ -7910,6 +7914,7 @@ version = "0.1.0"
 dependencies = [
  "mergiraf",
  "thiserror 2.0.18",
+ "tracing",
  "xml-3dm",
 ]
 
@@ -7920,6 +7925,7 @@ dependencies = [
  "serde",
  "tempfile",
  "thiserror 2.0.18",
+ "tracing",
  "yam-fs",
 ]
 

@@ -8,6 +8,7 @@ rust-version.workspace = true
 [dependencies]
 mergiraf.workspace = true
 thiserror.workspace = true
+tracing.workspace = true
 xml-3dm.workspace = true
 
 [lints]

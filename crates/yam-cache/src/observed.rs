@@ -56,6 +56,16 @@ fn observe_file_on(
       previous_hash: artifact.hash,
     },
   };
+  tracing::trace!(
+    source_id = input.key.source_id.as_str(),
+    source_role = input.key.source_role.as_storage(),
+    artifact_kind = input.key.kind.as_storage(),
+    logical_path = input.key.logical_path.as_str(),
+    hash = ?hash,
+    byte_len,
+    status = ?status,
+    "observed artifact"
+  );
 
   let id = upsert_observed_artifact(connection, input, &hash, sqlite_byte_len)?;
   let artifact = ArtifactRecord {

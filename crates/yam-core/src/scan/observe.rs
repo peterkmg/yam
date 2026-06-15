@@ -33,6 +33,14 @@ pub fn observe_loose_file(
   let source_id = artifact.input.key.source_id.as_str().to_string();
   let logical_path = artifact.input.key.logical_path.as_str().to_string();
   let merge_file_type = MergeableFileType::from_path(&logical_path);
+  tracing::trace!(
+    mod_name = %source_id,
+    relative_path = %logical_path,
+    path = %artifact.input.disk_path,
+    merge_file_type = ?merge_file_type,
+    changed = result.status.is_changed(),
+    "observed loose file"
+  );
 
   Ok(ScannedFile {
     mod_name: source_id,
@@ -59,6 +67,13 @@ pub fn observe_bundle(
   let logical_path = artifact.input.key.logical_path.as_str().to_string();
   let disk_path = artifact.input.disk_path;
   let bundle_changed = result.status.is_changed();
+  tracing::trace!(
+    mod_name = %source_id,
+    relative_path = %logical_path,
+    path = %disk_path,
+    changed = bundle_changed,
+    "observed bundle"
+  );
 
   let listed_entries = bundle_index::load_or_build(
     cache,
